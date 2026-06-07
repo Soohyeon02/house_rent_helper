@@ -44,11 +44,28 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         text = _extract_with_ocr(pdf_path)
 
     if not text.strip():
+        import platform as _platform
+        _os = _platform.system()
+        if _os == "Windows":
+            _ocr_guide = (
+                "  https://github.com/UB-Mannheim/tesseract/wiki 에서 설치 파일 다운로드\n"
+                "  (설치 시 'Korean' 언어팩 체크 필수)\n"
+                "  pip install pytesseract Pillow"
+            )
+        elif _os == "Darwin":
+            _ocr_guide = (
+                "  brew install tesseract tesseract-lang\n"
+                "  pip install pytesseract Pillow"
+            )
+        else:
+            _ocr_guide = (
+                "  sudo apt-get install tesseract-ocr tesseract-ocr-kor\n"
+                "  pip install pytesseract Pillow"
+            )
         return (
             "[텍스트 추출 실패] 스캔된 이미지 PDF입니다.\n"
-            "OCR을 사용하려면 다음 명령을 실행하세요:\n"
-            "  brew install tesseract tesseract-lang\n"
-            "  pip install pytesseract Pillow"
+            "OCR을 사용하려면 다음을 설치하세요:\n"
+            f"{_ocr_guide}"
         )
 
     return text
@@ -160,6 +177,15 @@ def _extract_with_ocr(pdf_path: str) -> str:
         import pytesseract
     except ImportError:
         return ""
+
+    # Windows PATH 미등록 환경 대응: 공통 설치 경로 직접 지정
+    try:
+        from auto_setup import get_tesseract_cmd
+        _cmd = get_tesseract_cmd()
+        if _cmd:
+            pytesseract.pytesseract.tesseract_cmd = _cmd
+    except Exception:
+        pass
 
     try:
         doc = fitz.open(pdf_path)

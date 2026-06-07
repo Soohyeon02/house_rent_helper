@@ -200,7 +200,7 @@ class ScoreGauge(QWidget):
         # 게이지 영역: 중앙 정렬 원
         radius = min(w // 2 - 20, h - 40)
         cx = w // 2
-        cy = h - 20
+        cy = h - 50
 
         rect = QRectF(cx - radius, cy - radius, radius * 2, radius * 2)
 

@@ -1,8 +1,7 @@
 """GUI 진입점
 
 사용:
-    pip install PyQt5 pdfplumber PyMuPDF
-    python main_gui.py
+    python main_gui.py  # 필요한 패키지는 자동으로 설치됩니다
 """
 
 import sys
@@ -11,7 +10,11 @@ import os
 # 프로젝트 루트를 sys.path에 추가 (패키지 임포트용)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from PyQt5.QtWidgets import QApplication
+# 필요 패키지 자동 설치 (다른 import보다 먼저 실행)
+import auto_setup
+auto_setup.check_and_install()
+
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
@@ -30,6 +33,15 @@ def main():
     font.setFamily("Apple SD Gothic Neo")
     font.setPointSize(13)
     app.setFont(font)
+
+    # Tesseract OCR 설치 여부 확인 — 없으면 경고 다이얼로그 표시
+    tesseract_warning = auto_setup.check_tesseract()
+    if tesseract_warning:
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setWindowTitle("Tesseract OCR 미설치")
+        msg.setText(tesseract_warning)
+        msg.exec_()
 
     window = MainWindow()
     window.show()
